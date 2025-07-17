@@ -6,8 +6,8 @@ opt.relativenumber = true
 opt.number = true
 
 -- tabs & indentation
-opt.tabstop = 2 -- 2 spaces for tabs (prettier default)
-opt.shiftwidth = 2 -- 2 spaces for indent width
+opt.tabstop = 2 -- 4 spaces for tabs (prettier default)
+opt.shiftwidth = 2 -- 4 spaces for indent width
 opt.expandtab = true -- expand tab to spaces
 opt.autoindent = true -- copy indent from current line when starting new one
 
@@ -37,3 +37,10 @@ opt.splitbelow = true -- split horizontal window to the bottom
 
 -- turn off swapfile
 opt.swapfile = false
+
+vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+vim.opt.breakindent = true
+vim.opt.mouse = "a" -- abilites the mouse or 'a'll interactions
+vim.opt.sidescrolloff = 8
+vim.opt.scrolloff = 5
+

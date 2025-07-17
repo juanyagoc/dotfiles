@@ -43,6 +43,8 @@ return {
         "vimdoc",
         "c",
         "python",
+        "java",
+        "latex",
       },
     })
   end,
