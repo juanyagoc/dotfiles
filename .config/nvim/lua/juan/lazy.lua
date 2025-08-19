@@ -11,16 +11,22 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
       { "\nPress any key to exit"},
     }, true, {})
     vim.fn.getchar()
-    os.exit(1)
+    os.exit(1) -- change this?
   end
 end
 vim.opt.rtp:prepend(lazypath)
 
 -- detecta los plugins y configura las notificaciones de sus actualizaciones
-require("lazy").setup({ { import = "juan.plugins" } }, {
-  checker = {
-    enabled = true,
-    notify = false,
-  },
-  change_detection = { notify = false, },
-})
+require("lazy").setup(
+    {
+        {import = "juan.plugins"},
+        {import = "juan.plugins.lsp"},
+    }, 
+    {
+      checker = {
+        enabled = true,
+        notify = false,
+      },
+      change_detection = { notify = false, },
+    }
+)

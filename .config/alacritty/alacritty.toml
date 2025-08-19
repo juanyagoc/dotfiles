@@ -16,6 +16,9 @@ opacity = 1
 program = "/bin/zsh"
 args = ["-l", "-c", "tmux -f ~/.config/tmux/tmux.conf new-session -A -s main \\; send-keys 'fastfetch' C-m"]
 
+[mouse]
+hide_when_typing = true
+
 [font]
 normal.family = "Hack Nerd Font Mono"
 size = 16
