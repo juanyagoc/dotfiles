@@ -7,7 +7,7 @@ Personal config for terminal and zsh shell, with Neovim and [Lazy.nvim](https://
 - macOS (soon abailable for windows)
 - Git
 
-## Installation
+## Installation (not finished, install.sh is empty)
 
 ```bash
 git clone https://github.com/juanyagoc/dotfiles.git ~/dotfiles
