@@ -40,10 +40,10 @@ return {
 
 		vim.opt.laststatus = 3
 
-		lualine.setup({
+        lualine.setup({
 			options = {
-				section_separators = "",
-				component_separators = "",
+				section_separators = { left = '', right = '' },
+				component_separators = { left = '', right = '' },
 				theme = "auto",
 				icons_enabled = true,
 				disabled_filetypes = {
@@ -52,10 +52,14 @@ return {
 				},
 			},
 			sections = {
+				lualine_a = { "mode" },
+				lualine_b = {},
 				lualine_c = {
 					{ custom_filepath },
 				},
 				lualine_x = {
+					{ "branch" },
+					{ "diff" },
 					{
 						lazy_status.updates,
 						cond = lazy_status.has_updates,
@@ -64,11 +68,12 @@ return {
 					{ "encoding" },
 					{ "fileformat" },
 					{ "filetype" },
-				},
-				lualine_z = {
 					{ "location" },
 				},
+				lualine_y = {},
+				lualine_z = {},
 			},
 		})
 	end,
 }
+

@@ -14,7 +14,7 @@ opacity = 1
 
 [terminal.shell]
 program = "/bin/zsh"
-args = ["-l", "-c", "tmux -f ~/.config/tmux/tmux.conf new-session -A -s main \\; send-keys 'fastfetch' C-m"]
+args = ["-l", "-c", "/opt/homebrew/bin/tmux new-session -A -s main \\; send-keys 'fastfetch' C-m"]
 
 [mouse]
 hide_when_typing = true

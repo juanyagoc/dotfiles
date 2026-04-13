@@ -1,3 +1,5 @@
+-- ~/.config/nvim/lua/juan/lazy.lua
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 -- si no encuentra lazy lo clona de github
@@ -11,17 +13,17 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
       { "\nPress any key to exit"},
     }, true, {})
     vim.fn.getchar()
-    os.exit(1) -- change this?
+    os.exit(1)
   end
 end
 vim.opt.rtp:prepend(lazypath)
 
--- detecta los plugins y configura las notificaciones de sus actualizaciones
+-- Detect the listed plugins and configure its update notifications
 require("lazy").setup(
     {
-        {import = "juan.plugins"},
-        {import = "juan.plugins.lsp"},
-    }, 
+        { import = "juan.plugins"     }, -- main plugins folder
+        { import = "juan.plugins.lsp" }, -- lspconfig subfolder
+    },
     {
       checker = {
         enabled = true,
@@ -30,3 +32,4 @@ require("lazy").setup(
       change_detection = { notify = false, },
     }
 )
+

@@ -10,12 +10,14 @@ return {
     treesitter.setup({ -- enable syntax highlighting
       highlight = {
         enable = true,
+        additional_vim_regex_highlighting = false,
         disable = { "latex" }, -- disabled for .tex, better coloring with vimtex
       },
       -- enable indentation
       indent = { enable = true },
       -- ensure these language parsers are installed
       ensure_installed = {
+        "asm",
         "json",
         "javascript",
         "typescript",
@@ -37,8 +39,9 @@ return {
         "c",
         "python",
         "java",
-        "latex",
+        "haskell"
       },
     })
   end,
 }
+

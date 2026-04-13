@@ -1,6 +1,6 @@
--- .config/nvim/init.lua
+-- ~/.config/nvim/init.lua
 
--- Load personalized modules
+-- Load personalized modules with this safe loading function
 local function safe_require(mod)
   local ok, _ = pcall(require, mod)
   if not ok then
@@ -10,4 +10,6 @@ end
 
 safe_require("juan.core")
 safe_require("juan.lazy")
+
+vim.cmd.colorscheme("kanagawa-dragon")
 

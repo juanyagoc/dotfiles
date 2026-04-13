@@ -1,1 +1,15 @@
 .DS_Store
+
+# NO aportan nada interesante
+.config/oh-my-zsh/
+.config/tmux/plugins/
+.config/zathura/
+.config/github-copilot/
+.config/ghc
+.config/ghcup
+.config/git
+.config/wireshark
+.config/zsh
+.config/jgit
+.config/npm
+
