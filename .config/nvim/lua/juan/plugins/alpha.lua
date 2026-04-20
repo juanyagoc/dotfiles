@@ -16,13 +16,13 @@ return {
 
         dashboard.section.buttons.val = {
             dashboard.button("e", "  > Nuevo archivo vacío", "<cmd>ene<CR>"),
-            dashboard.button("SPC ee", "  > Explorador de archivos", "<cmd>NvimTreeToggle<CR>"),
-            dashboard.button("SPC ff", "󰱼  > Buscar archivo", "<cmd>Telescope find_files<CR>"),
-            dashboard.button("SPC fg", "󰊄  > Buscar texto (Grep)", "<cmd>Telescope live_grep<CR>"),
-            dashboard.button("SPC r", "  > Archivos recientes", "<cmd>Telescope oldfiles<CR>"),
-            dashboard.button("SPC wr", "󰁯  > Restaurar Sesión", "<cmd>SessionRestore<CR>"),
-            dashboard.button("a", "󰙨  > Teoría de Autómatas", "<cmd>cd ~/Proyectos/personal/number-of-strings | NvimTreeToggle<CR>"),
-            dashboard.button("c", "  > Programación Competitiva", "<cmd>cd ~/Proyectos/cp/code-forces/contests | NvimTreeToggle<CR>"),
+            dashboard.button("SPC ee", "  > Explorador de archivos", "<cmd>Neotree<CR>"),
+            dashboard.button("SPC ff", "󰱼  > Buscar archivo", "<cmd>FzfLua files<CR>"),
+            dashboard.button("SPC fg", "󰊄  > Buscar texto (Grep)", "<cmd>FzfLua live_grep<CR>"),
+            dashboard.button("SPC r", "  > Archivos recientes", "<cmd>FzfLua oldfiles<CR>"),
+            dashboard.button("SPC wr", "󰁯  > Restaurar Sesión", "<cmd>AutoSession restore<CR>"),
+            dashboard.button("a", "󰙨  > Teoría de Autómatas", "<cmd>cd ~/Proyectos/personal/number-of-strings | Neotree<CR>"),
+            dashboard.button("c", "  > Programación Competitiva", "<cmd>cd ~/Proyectos/cp/code-forces/contests | Neotree<CR>"),
             dashboard.button("q", "  > Salir", "<cmd>qa<CR>"),
         }
 

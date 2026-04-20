@@ -1,6 +1,7 @@
 return {
   "nvim-treesitter/nvim-treesitter",
   event = { "BufReadPre", "BufNewFile" },
+  branch = "master", -- without this I get an error
   build = ":TSUpdate",
   config = function()
     -- import nvim-treesitter plugin
@@ -19,12 +20,7 @@ return {
       ensure_installed = {
         "asm",
         "json",
-        "javascript",
-        "typescript",
-        "tsx",
         "yaml",
-        "html",
-        "css",
         "markdown",
         "markdown_inline",
         "svelte",
