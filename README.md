@@ -1,16 +1,77 @@
 # My Dotfiles
 
-Personal config for terminal and zsh shell, with Neovim and [Lazy.nvim](https://github.com/folke/lazy.nvim) as the plugin manager, all written in Lua.
+Personal config for terminal, zsh shell and brew tools. With Neovim and [Lazy.nvim](https://github.com/folke/lazy.nvim) as the plugin manager, using Lua.
+
+## What's included
+
+| Tool | Config |
+|---|---|
+| **Alacritty** | Terminal emulator config + themes |
+| **tmux** | Terminal multiplexer config |
+| **Neovim** | LazyVim setup (`init.lua`, `lua/`, `lazy-lock.json`) |
+| **Zsh** | Config lives under `.config/zsh` (uses `ZDOTDIR`). Oh My Zsh is installed officially by `install.sh`; only `custom/` (your plugins, aliases, theme) is versioned here |
+| **Starship** | Prompt config (used alongside p10k) |
+| **fastfetch** | System info on shell startup |
+| **zathura** | PDF viewer theme (cloned on install, not versioned here) |
+| **Homebrew** | `Brewfile` with all CLI tools and casks |
+| **Fonts** | Hack Nerd Font (Mono, Propo, regular) |
 
 ## Requirements
 
-- macOS (soon abailable for windows)
+- macOS with Apple Silicon chip (I use the M3 model)
 - Git
+- Admin rights on the machine (Homebrew install and `chsh` need `sudo`)
 
-## Installation (not finished, install.sh is empty)
+## Installation
 
 ```bash
 git clone https://github.com/juanyagoc/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 chmod +x install.sh
 ./install.sh
+```
+
+`install.sh` is idempotent — safe to run more than once. It will:
+
+1. Verify you're on macOS + Apple Silicon (arm64)
+2. Install Homebrew if it's missing
+3. Run `brew bundle` against the `Brewfile`
+4. Symlink `.config/*` folders/files into `~/.config`, backing up anything already there
+5. Set `ZDOTDIR` via `~/.zshenv` so zsh reads its config from `~/.config/zsh`
+6. Install Oh My Zsh officially, then overlay the versioned `custom/` folder on top
+7. Install Hack Nerd Font into `~/Library/Fonts`
+8. Clone Powerlevel10k, zsh-autosuggestions, zsh-syntax-highlighting, and the zathura theme if missing
+9. Sync Neovim/LazyVim plugins headlessly using `lazy-lock.json`
+10. Set zsh as the default shell
+
+## After installing
+
+- **Open a new terminal window** (don't just `source` your rc files). `~/.zshenv` is only read when a shell starts, so the current session won't pick up `ZDOTDIR` until you open a fresh one.
+- Existing configs found before installing are backed up to `~/.dotfiles_backup_<timestamp>`, never overwritten silently.
+- In Alacritty, make sure the font is set to a Hack Nerd Font variant if it isn't picked up automatically.
+- First time you open Neovim, run `:Lazy` to confirm all plugins synced correctly.
+
+## Repo structure
+
+```
+dotfiles/
+├── .config/
+│   ├── alacritty/
+│   ├── fastfetch/
+│   ├── homebrew/
+│   ├── nvim/           # LazyVim
+│   ├── oh-my-zsh/
+│   │   └── custom/     # the only part versioned; framework installed by install.sh
+│   ├── starship.toml
+│   └── tmux/
+│   └── zsh/            # .zshrc, .p10k.zsh (ZDOTDIR target)
+├── fonts/Hack/
+├── Brewfile
+├── install.sh
+└── README.md
+```
+
+`.config/oh-my-zsh` (except `custom/`), `.config/zathura`, and `.config/tmux/plugins` aren't versioned — they're installed/cloned by `install.sh` on setup.
+
+**Note on Oh My Zsh:** only `.config/oh-my-zsh/custom` is versioned in this repo. The framework itself, plus `zsh-autosuggestions`, `zsh-syntax-highlighting`, and Powerlevel10k, are installed fresh by `install.sh` and are gitignored — so `omz update` works normally.
+

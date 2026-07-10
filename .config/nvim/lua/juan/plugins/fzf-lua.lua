@@ -17,13 +17,13 @@ return {
                     scrollbar = false,
                 }
             },
-            fzf_opts = {
+            --[[fzf_opts = {
                 ["--layout"] = "reverse",
                 ["--info"] = "inline",
                 ["--border"] = "none",
                 ["--margin"] = "0",
                 ["--padding"] = "0",
-            }
+            }]]--
         })
         local map = vim.keymap.set
         map("n", "<leader>ff", function() fzf.files() end, { desc = "Buscar Archivos (fzf)" })

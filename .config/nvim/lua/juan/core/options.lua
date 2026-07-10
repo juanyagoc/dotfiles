@@ -5,6 +5,7 @@ local opt = vim.opt
 
 opt.number = true         -- show the line numbers
 opt.relativenumber = true -- relative line numbering
+opt.numberwidth = 1
 
 -- tabs & indentation
 opt.tabstop = 4       -- 4 spaces for tabs (prettier default)

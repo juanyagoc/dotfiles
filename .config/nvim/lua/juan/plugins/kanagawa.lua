@@ -1,6 +1,6 @@
 return {
 	"rebelot/kanagawa.nvim",
-    priority = 10001,
+    priority = 10000,
 	config = function()
 		require("kanagawa").setup({
 			compile = false, -- enable compiling the colorscheme
@@ -20,14 +20,23 @@ return {
 					lotus = {},
 					dragon = {},
 					all = {
-						-- ui = { bg_gutter = "none" }, -- deletes the numberline column background color
+						ui = { bg_gutter = "none" }, -- hides numberline column background
 					},
 				},
 			},
 			overrides = function(colors) -- add/modify highlights
-				return {}
+                local palette = colors.palette
+				return {
+                    FloatTitle  = { fg = palette.crystalBlue, bg = "none", bold = true },
+                    NormalFloat = { bg = "none" },
+                    FloatBorder = { fg = palette.dragonBlue, bg = "none" },
+                    Pmenu       = { bg = palette.sumiInk1 }, -- general background
+                    PmenuSel    = { bg = palette.winterBlue, blend = 0 }, -- selection background
+                    PmenuSbar   = { bg = "none" }, -- schroll bar background
+                    PmenuThumb  = { bg = "none" }, -- schroll bar item
+                }
 			end,
-			theme = "dragon", -- Load "wave" theme when 'background' option is not set
+			theme = "dragon", -- load "wave" theme when 'background' option is not set
 			background = { -- map the value of 'background' option to a theme
 				dark = "dragon",
 				light = "lotus",
