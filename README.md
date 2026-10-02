@@ -4,6 +4,12 @@
 
 Personal config for terminal, zsh shell and brew tools. With Neovim and [Lazy.nvim](https://github.com/folke/lazy.nvim) as the plugin manager, using Lua.
 
+## Screenshots
+
+<img width="1404" alt="Nvim main screen" src="https://github.com/user-attachments/assets/f691c985-1f11-4eba-962e-06b2a8a35dbf" />
+<img width="1405" alt="Fuzzy Finder explorer" src="https://github.com/user-attachments/assets/d25ef21d-b6b1-45b9-8957-e09480b50593" />
+<img width="1409" alt="Lean code example" src="https://github.com/user-attachments/assets/71d1965e-4d8b-4253-9d9b-da4d393da342" />
+
 ## What's included
 
 | Tool | Config |
