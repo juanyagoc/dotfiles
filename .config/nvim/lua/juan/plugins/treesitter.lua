@@ -1,43 +1,41 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  event = { "BufReadPre", "BufNewFile" },
-  branch = "master", -- without this I get an error
+  branch = "main",
+  lazy = false, -- la rama main no admite lazy loading (y es ligera)
   build = ":TSUpdate",
   config = function()
-    -- import nvim-treesitter plugin
-    local treesitter = require("nvim-treesitter.configs")
+    require("nvim-treesitter").install({
+      "c_sharp",
+      "asm",
+      "json",
+      "yaml",
+      "markdown",
+      "markdown_inline",
+      "svelte",
+      "graphql",
+      "bash",
+      "lua",
+      "vim",
+      "dockerfile",
+      "gitignore",
+      "query",
+      "vimdoc",
+      "c",
+      "python",
+      "java",
+      "haskell",
+      "sql",
+    })
 
-    -- configure treesitter
-    treesitter.setup({ -- enable syntax highlighting
-      highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = false,
-        disable = { "latex" }, -- disabled for .tex, better coloring with vimtex
-      },
-      -- enable indentation
-      indent = { enable = true },
-      -- ensure these language parsers are installed
-      ensure_installed = {
-        "asm",
-        "json",
-        "yaml",
-        "markdown",
-        "markdown_inline",
-        "svelte",
-        "graphql",
-        "bash",
-        "lua",
-        "vim",
-        "dockerfile",
-        "gitignore",
-        "query",
-        "vimdoc",
-        "c",
-        "python",
-        "java",
-        "haskell"
-      },
+    -- resaltado e indentación con treesitter cuando haya parser
+    vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("juan_treesitter", { clear = true }),
+      callback = function(ev)
+        if ev.match == "tex" then return end -- mejor coloreado con VimTeX
+        if pcall(vim.treesitter.start, ev.buf) then
+          vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
+      end,
     })
   end,
 }
-

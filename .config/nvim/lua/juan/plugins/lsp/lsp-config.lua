@@ -1,8 +1,9 @@
 return {
     {
         "saghen/blink.cmp",
+        event = { "InsertEnter", "CmdlineEnter" },
         dependencies = {
-            "L3MON4D3/LuaSnip", -- Soporte para snippets
+            { "L3MON4D3/LuaSnip", build = "make install_jsregexp" },
             "rafamadriz/friendly-snippets",
         },
         version = "*",
@@ -17,7 +18,12 @@ return {
                 ["<S-Tab>"] = { "snippet_backward", "fallback" },
             },
             signature = { window = { border = "rounded" } },
-            sources = { default = { "lsp", "path", "buffer", "snippets" } },
+            sources = {
+                default = { "lazydev", "lsp", "path", "buffer", "snippets" },
+                providers = {
+                    lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", score_offset = 100 },
+                },
+            },
             completion = {
                 menu = {
                     draw = {
@@ -25,37 +31,40 @@ return {
                     },
                 },
             },
-            snippets = {
-                expand = function(snippet)
-                    require("luasnip").lsp_expand(snippet)
-                end,
-            },
+            snippets = { preset = "luasnip" },
             fuzzy = {
                 implementation = "prefer_rust",
                 prebuilt_binaries = { download = true },
             },
         },
+        config = function(_, opts)
+            require("luasnip.loaders.from_vscode").lazy_load() -- friendly-snippets
+            require("blink.cmp").setup(opts)
+        end,
     },
 
     -- ============================================================================
-    -- CONFIGURACIONES DE LINTERS Y FORMATTERS (EFM)
+    -- CONFIGURACIONES DE LINTERS Y FORMATTERS
     -- ============================================================================
     {
         "creativenull/efmls-configs-nvim",
-        dependencies = { "neovim/nvim-lspconfig" },
+        lazy = true,
     },
 
     -- ============================================================================
-    -- CONFIGURACIÓN PRINCIPAL LSP (El "Cerebro")
+    -- CONFIGURACIÓN PRINCIPAL LSP
     -- ============================================================================
     {
         "neovim/nvim-lspconfig",
+        event = { "BufReadPre", "BufNewFile" },
         dependencies = {
-            "saghen/blink.cmp",
+            -- mason debe cargarse antes para añadir sus binarios al PATH
+            "mason-org/mason.nvim",
+            "mason-org/mason-lspconfig.nvim",
             "creativenull/efmls-configs-nvim",
         },
         config = function()
-            local capabilities = require("blink.cmp").get_lsp_capabilities()
+            -- blink.cmp registra sus capabilities en vim.lsp.config("*") automáticamente
             local diagnostic_signs = { Error = " ", Warn = " ", Hint = "", Info = "" }
             vim.diagnostic.config({
                 virtual_text = { prefix = "●", spacing = 4 },
@@ -72,7 +81,7 @@ return {
                 severity_sort = true,
                 float = {
                     border = "rounded",
-                    source = "always",
+                    source = true,
                     header = "",
                     prefix = "",
                     focusable = false,
@@ -80,95 +89,90 @@ return {
                 },
             })
 
+            -- Formatea con efm si está conectado al buffer; si no, con cualquier LSP que pueda
+            local function format_buffer()
+                local bufnr = vim.api.nvim_get_current_buf()
+                local has_efm = #vim.lsp.get_clients({ bufnr = bufnr, name = "efm" }) > 0
+                vim.lsp.buf.format({
+                    async = true,
+                    filter = function(client) return not has_efm or client.name == "efm" end,
+                })
+            end
+
             -- ----------------------------------------------------------------------
             -- Atajos de teclado que se activan SÓLO cuando un LSP se conecta
+            -- (0.12 ya trae grn, gra, grr, gri, ]d y [d por defecto)
             -- ----------------------------------------------------------------------
             local function lsp_on_attach(ev)
-                local client = vim.lsp.get_client_by_id(ev.data.client_id)
-                if not client then return end
-                local bufnr = ev.buf
-                local opts = { noremap = true, silent = true, buffer = bufnr }
-
-                local fzf = require("fzf-lua")
+                local function lsp_definitions() require("fzf-lua").lsp_definitions({ jump1 = true }) end
+                local function map(lhs, rhs, desc)
+                    vim.keymap.set("n", lhs, rhs, { buffer = ev.buf, silent = true, desc = desc })
+                end
 
                 -- Navegación con Fzf-Lua
-                vim.keymap.set("n", "<leader>gd", function() fzf.lsp_definitions({ jump1 = true }) end, opts)
-                vim.keymap.set("n", "<leader>gD", vim.lsp.buf.definition, opts)
-                vim.keymap.set("n", "<leader>gS", function() vim.cmd("vsplit"); vim.lsp.buf.definition() end, opts)
-                vim.keymap.set("n", "<leader>fd", function() fzf.lsp_definitions({ jump1 = true }) end, opts)
-                vim.keymap.set("n", "<leader>fr", fzf.lsp_references, opts)
-                vim.keymap.set("n", "<leader>ft", fzf.lsp_typedefs, opts)
-                vim.keymap.set("n", "<leader>fs", fzf.lsp_document_symbols, opts)
-                vim.keymap.set("n", "<leader>fw", fzf.lsp_workspace_symbols, opts)
-                vim.keymap.set("n", "<leader>fi", fzf.lsp_implementations, opts)
+                map("<leader>gd", lsp_definitions, "LSP: Definición (fzf)")
+                map("<leader>gD", vim.lsp.buf.definition, "LSP: Definición")
+                map("<leader>gS", function() vim.cmd.vsplit(); vim.lsp.buf.definition() end, "LSP: Definición en split")
+                map("<leader>fd", lsp_definitions, "LSP: Definición (fzf)")
+                map("<leader>fr", "<cmd>FzfLua lsp_references<cr>", "LSP: Referencias")
+                map("<leader>ft", "<cmd>FzfLua lsp_typedefs<cr>", "LSP: Tipos")
+                map("<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", "LSP: Símbolos del documento")
+                map("<leader>fw", "<cmd>FzfLua lsp_workspace_symbols<cr>", "LSP: Símbolos del workspace")
+                map("<leader>fi", "<cmd>FzfLua lsp_implementations<cr>", "LSP: Implementaciones")
 
                 -- Acciones de código y refactorización
-                vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-                vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+                map("<leader>ca", vim.lsp.buf.code_action, "LSP: Code action")
+                map("<leader>rn", vim.lsp.buf.rename, "LSP: Renombrar")
+                map("<leader>cf", format_buffer, "LSP: Formatear buffer")
 
                 -- Diagnósticos
-                vim.keymap.set("n", "<leader>D", function() vim.diagnostic.open_float({ scope = "line" }) end, opts)
-                vim.keymap.set("n", "<leader>d", function() vim.diagnostic.open_float({ scope = "cursor" }) end, opts)
-                vim.keymap.set("n", "<leader>nd", function() vim.diagnostic.jump({ count = 1 }) end, opts)
-                vim.keymap.set("n", "<leader>pd", function() vim.diagnostic.jump({ count = -1 }) end, opts)
-
-                -- Auto-organizar imports
-                if client:supports_method("textDocument/codeAction", bufnr) then
-                    vim.keymap.set("n", "<leader>oi", function()
-                        vim.lsp.buf.code_action({
-                            context = { only = { "source.organizeImports" }, diagnostics = {} },
-                            apply = true,
-                            bufnr = bufnr,
-                        })
-                        vim.defer_fn(function() vim.lsp.buf.format({ bufnr = bufnr }) end, 50)
-                    end, opts)
-                end
+                map("<leader>D", function() vim.diagnostic.open_float({ scope = "line" }) end, "Diagnósticos de la línea")
+                map("<leader>d", function() vim.diagnostic.open_float({ scope = "cursor" }) end, "Diagnóstico bajo el cursor")
+                map("<leader>nd", function() vim.diagnostic.jump({ count = 1 }) end, "Siguiente diagnóstico")
+                map("<leader>pd", function() vim.diagnostic.jump({ count = -1 }) end, "Diagnóstico anterior")
             end
 
             -- Autocommand para asignar las teclas al abrir un archivo compatible
             local lsp_group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true })
             vim.api.nvim_create_autocmd("LspAttach", { group = lsp_group, callback = lsp_on_attach })
-            -- Atajos globales de diagnóstico
-            vim.keymap.set("n", "<leader>q", function() vim.diagnostic.setloclist({ open = true }) end, { desc = "Open diagnostic list" })
-            vim.keymap.set("n", "<leader>dl", vim.diagnostic.open_float, { desc = "Show line diagnostics" })
 
             -- ----------------------------------------------------------------------
             -- Inicialización de Servidores LSP
             -- ----------------------------------------------------------------------
-            vim.lsp.config["*"] = { capabilities = capabilities }
-            vim.lsp.config("pyright", {})
-            vim.lsp.config("clangd", {})
-            vim.lsp.config("jdtls", {})
-            vim.lsp.config("hls", {})
-            vim.lsp.config("texlab", {})
-            vim.lsp.config("jsonls", {})
+            vim.lsp.config("clangd", {
+                cmd = {
+                    "/opt/homebrew/opt/llvm/bin/clangd",
+                    "--query-driver=/opt/homebrew/bin/g++-16,/opt/homebrew/bin/gcc-16,/usr/local/bin/g++-16,/usr/local/bin/gcc-16",
+                },
+            })
             vim.lsp.config("lua_ls", {
-                settings = { Lua = { diagnostics = { globals = { "vim" } }, telemetry = { enable = false } } },
+                settings = { Lua = { telemetry = { enable = false } } }, -- los globals de vim los aporta lazydev
+            })
+            vim.lsp.config("sqlls", {
+                filetypes = { "sql", "mysql", "postgresql" },
+                root_dir = function(_, on_dir) on_dir(vim.fn.getcwd()) end,
             })
 
             -- ----------------------------------------------------------------------
             -- Inicialización de EFM (Formatters y Linters)
             -- ----------------------------------------------------------------------
             local stylua = require("efmls-configs.formatters.stylua")
-            local flake8 = require("efmls-configs.linters.flake8")
-            local black = require("efmls-configs.formatters.black")
-            local fixjson = require("efmls-configs.formatters.fixjson")
-            local cpplint = require("efmls-configs.linters.cpplint")
-            local clangfmt = require("efmls-configs.formatters.clang_format")
+            local ruff = require("efmls-configs.linters.ruff")
+            local cppcheck = require("efmls-configs.linters.cppcheck")
+            local sqlformatter = require("efmls-configs.formatters.sql-formatter")
 
             vim.lsp.config("efm", {
                 filetypes = {
-                    "c", "cpp", "python", "json", "jsonc", "lua"
+                    "c", "cpp", "python", "lua", "sql"
                 },
                 init_options = { documentFormatting = true },
                 settings = {
                     languages = {
-                        c = { clangfmt, cpplint },
-                        cpp = { clangfmt, cpplint },
-                        python = { flake8, black },
-                        json = { fixjson },
-                        jsonc = { fixjson },
+                        c = { cppcheck },
+                        cpp = { cppcheck },
+                        python = { ruff },
                         lua = { stylua },
+                        sql = { sqlformatter },
                     },
                 },
             })
@@ -181,9 +185,9 @@ return {
                 "texlab",
                 "jsonls",
                 "lua_ls",
+                "sqlls",
                 "efm",
             })
         end,
     },
 }
-

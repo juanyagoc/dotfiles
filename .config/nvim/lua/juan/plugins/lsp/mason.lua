@@ -11,37 +11,41 @@ return {
     },
   },
   {
+    -- se carga como dependencia de nvim-lspconfig (ver lsp-config.lua)
     "mason-org/mason-lspconfig.nvim",
+    lazy = true,
     dependencies = { "mason-org/mason.nvim" },
     opts = {
       ensure_installed = {
         "pyright", -- Python
-        "clangd",  -- C / C++
         "jdtls",   -- Java
         "hls",     -- Haskell
         "texlab",  -- LaTeX
         "jsonls",  -- JSON
         "lua_ls",  -- Neovim config
         "efm",     -- Motor de Linters/Formatters
+        "sqlls",   -- SQL
       },
-      automatic_installation = true,
+      automatic_enable = false, -- los servidores se activan con vim.lsp.enable en lsp-config.lua
     },
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
+    event = "VeryLazy",
     dependencies = { "mason-org/mason.nvim" },
     opts = {
       ensure_installed = {
-        "black",        -- Formateador Python
-        "flake8",       -- Linter Python
-        "clang-format", -- Formateador C/C++
-        "cpplint",      -- Linter C/C++
-        "fixjson",      -- Formateador JSON
+        "ruff",         -- Linter y formatter Python
         "stylua",       -- Formateador Lua
+        "sql-formatter",-- Formateador de SQL
       },
       auto_update = false,
       run_on_start = true,
     },
+    config = function(_, opts)
+      local mti = require("mason-tool-installer")
+      mti.setup(opts)
+      mti.run_on_start() -- su autocmd de VimEnter ya pasó al cargar en VeryLazy
+    end,
   },
 }
-

@@ -4,26 +4,24 @@ live_config_reload = true
 
 [env]
 TERM = "xterm-256color"
+XDG_CONFIG_HOME = "~/.config"
 
 [window]
 padding.x = 0
 padding.y = 0
 # decorations = "Buttonless"
-startup_mode = "Maximized"
+startup_mode = "Fullscreen"
 opacity = 1
 
 [terminal.shell]
 program = "/bin/zsh"
-args = ["-l", "-c", "/opt/homebrew/bin/tmux new-session -A -s main \\; send-keys 'fastfetch' C-m"]
+args = ["-l"] 
 
 [mouse]
 hide_when_typing = true
 
 [font]
 normal = { family = "Hack Nerd Font Mono", style = "Regular" }
-bold   = { family = "Hack Nerd Font Mono", style = "Bold" }
-italic = { family = "Hack Nerd Font Mono", style = "Italic" }
-bold_italic = { family = "Hack Nerd Font Mono", style = "Bold Italic" }
 size = 16
 
 [cursor]

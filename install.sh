@@ -117,7 +117,6 @@ mkdir -p "$CONFIG_DST"
 link_item "$CONFIG_SRC/alacritty"     "$CONFIG_DST/alacritty"
 link_item "$CONFIG_SRC/fastfetch"     "$CONFIG_DST/fastfetch"
 link_item "$CONFIG_SRC/nvim"          "$CONFIG_DST/nvim"
-link_item "$CONFIG_SRC/starship.toml" "$CONFIG_DST/starship.toml"
 link_item "$CONFIG_SRC/tmux"          "$CONFIG_DST/tmux"
 link_item "$CONFIG_SRC/zsh"           "$CONFIG_DST/zsh"
 link_item "$CONFIG_SRC/homebrew"      "$CONFIG_DST/homebrew"
@@ -126,19 +125,37 @@ link_item "$CONFIG_SRC/homebrew"      "$CONFIG_DST/homebrew"
 # 5b. ~/.zshenv - required for zsh (and the Oh My Zsh installer)
 #     to know where ZDOTDIR is BEFORE touching .zshrc
 # ────────────────────────────────────────────────────────────
-ZSHENV_LINE="export ZDOTDIR="$HOME/.config/zsh""
 ZSHENV_PATH="$HOME/.zshenv"
 
-if [[ -f "$ZSHENV_PATH" ]] && grep -qF 'ZDOTDIR' "$ZSHENV_PATH"; then
-  c_ok "$HOME/.zshenv already defines ZDOTDIR."
-else
-  if [[ -f "$ZSHENV_PATH" ]]; then
+# Definimos el bloque de variables XDG y ZDOTDIR
+read -r -d '' XDG_BLOCK << 'EOF' || true
+
+# --- XDG Base Directory Specification ---
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+export ZDOTDIR="$HOME/.config/zsh"
+EOF
+
+if [[ -f "$ZSHENV_PATH" ]]; then
+  # Comprobamos si ya tiene la variable para evitar duplicados si lo ejecutas varias veces
+  if grep -qF 'XDG_CONFIG_HOME' "$ZSHENV_PATH"; then
+    c_ok "$HOME/.zshenv already contains XDG variables."
+  else
+    # Hacemos backup usando tus variables
     mkdir -p "$BACKUP_DIR"
     cp "$ZSHENV_PATH" "$BACKUP_DIR/.zshenv_$(date +%s)"
     c_warn "Backup of existing ~/.zshenv created."
+    
+    # Añadimos las variables al final del archivo
+    echo "$XDG_BLOCK" >> "$ZSHENV_PATH"
+    c_ok "$HOME/.zshenv updated with XDG variables and ZDOTDIR."
   fi
-  printf '%s\n' "$ZSHENV_LINE" >> "$ZSHENV_PATH"
-  c_ok "$HOME/.zshenv created/updated with ZDOTDIR=$CONFIG_DST/zsh"
+else
+  # Si no existe, lo creamos directamente
+  echo "$XDG_BLOCK" > "$ZSHENV_PATH"
+  c_ok "$HOME/.zshenv created with XDG variables and ZDOTDIR."
 fi
 
 # Export ZDOTDIR in THIS session of the script as well (the file above
@@ -263,5 +280,5 @@ if [[ -d "$BACKUP_DIR" ]]; then
 fi
 c_info "Open Alacritty and select the 'Hack Nerd Font' font in alacritty.toml if it is not already configured."
 c_info "ZDOTDIR points to $CONFIG_DST/zsh - open a NEW terminal (running 'source' is not enough) for ~/.zshenv to take effect."
-c_info "Verify inside .config/zsh/.zshrc that ZSH=\"$CONFIG_DST/oh-my-zsh\" and starship initializes with: eval \"\$(starship init zsh)\""
+c_info "Verify inside .config/zsh/.zshrc that ZSH=\"$CONFIG_DST/oh-my-zsh\""
 

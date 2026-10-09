@@ -1,16 +1,19 @@
 tap "homebrew-zathura/zathura", trusted: true
 tap "jesseduffield/lazygit", trusted: true
-tap "thomas-mauran/tap"
-# Core application library for C
-brew "glib"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
+# Core application library for C
+brew "glib"
 # Versatile and fast Unicode/ASCII/ANSI graphics renderer
 brew "chafa"
 # Check Java source against a coding standard
 brew "checkstyle"
+# Static analysis of C and C++ code
+brew "cppcheck"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
+# Load/unload environment variables based on $PWD
+brew "direnv"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
 # Like neofetch, but much faster because written mostly in C
@@ -29,6 +32,8 @@ brew "gnupg"
 brew "gnuplot"
 # GNU grep, egrep and fgrep
 brew "grep"
+# Next-gen compiler infrastructure
+brew "llvm"
 # Language Server for the Lua language
 brew "lua-language-server"
 # Package manager for the Lua programming language
@@ -49,29 +54,20 @@ brew "pandoc"
 brew "pandoc-plot"
 # Pinentry for GPG on Mac
 brew "pinentry-mac"
-# Python package management tool
-brew "poetry"
-# Python version management
-brew "pyenv"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
-# Cross-shell prompt for astronauts
-brew "starship"
+# Extremely fast Python linter, written in Rust
+brew "ruff"
+# Opinionated Lua code formatter
+brew "stylua"
 # Terminal multiplexer
 brew "tmux"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
-# Internet file retriever
-brew "wget"
-# PDF viewer
-brew "homebrew-zathura/zathura/zathura"
-# MuPDF backend plugin for zathura
-brew "homebrew-zathura/zathura/zathura-pdf-mupdf"
-# GPU-accelerated terminal emulator
-cask "alacritty"
+# Parser generator tool
+brew "tree-sitter-cli"
+# Developer platform
+cask "dotnet-sdk"
 cask "font-hack-nerd-font"
 cask "font-meslo-lg-nerd-font"
-# JDK from the Eclipse Foundation (Adoptium)
-cask "temurin@21"
-npm "@anthropic-ai/claude-code"
 npm "neovim"

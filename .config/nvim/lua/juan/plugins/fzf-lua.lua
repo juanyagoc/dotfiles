@@ -1,36 +1,36 @@
 return {
     "ibhagwan/fzf-lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
-        local fzf = require("fzf-lua")
-        fzf.setup({
-            "telescope",
-            winopts = {
-                height = 0.60,
-                width = 0.70,
+    cmd = "FzfLua",
+    keys = {
+        { "<leader>ff", "<cmd>FzfLua files<cr>",           desc = "Buscar Archivos (fzf)" },
+        { "<leader>fg", "<cmd>FzfLua live_grep<cr>",       desc = "Live Grep (fzf)" },
+        { "<leader>fz", "<cmd>FzfLua blines<cr>",          desc = "Archive grep (fzf)" },
+        { "<leader>fb", "<cmd>FzfLua buffers<cr>",         desc = "Buscar Buffers (fzf)" },
+        { "<leader>fh", "<cmd>FzfLua help_tags<cr>",       desc = "Ayuda Neovim (fzf)" },
+        { "<leader>fc", "<cmd>FzfLua command_history<cr>", desc = "Historial Comandos (fzf)" },
+    },
+    init = function()
+        -- Usa fzf-lua para vim.ui.select (sustituye a dressing.nvim) sin cargarlo al inicio
+        ---@diagnostic disable-next-line: duplicate-set-field
+        vim.ui.select = function(...)
+            require("fzf-lua").register_ui_select()
+            return vim.ui.select(...)
+        end
+    end,
+    opts = {
+        "telescope",
+        winopts = {
+            height = 0.60,
+            width = 0.70,
+            border = "rounded",
+            preview = {
+                default = "builtin",
                 border = "rounded",
-                preview = {
-                    default = "builtin",
-                    border = "rounded",
-                    layout = "horizontal",
-                    horizontal = "right:50%",
-                    scrollbar = false,
-                }
-            },
-            --[[fzf_opts = {
-                ["--layout"] = "reverse",
-                ["--info"] = "inline",
-                ["--border"] = "none",
-                ["--margin"] = "0",
-                ["--padding"] = "0",
-            }]]--
-        })
-        local map = vim.keymap.set
-        map("n", "<leader>ff", function() fzf.files() end, { desc = "Buscar Archivos (fzf)" })
-        map("n", "<leader>fg", function() fzf.live_grep() end, { desc = "Live Grep (fzf)" })
-        map("n", "<leader>fb", function() fzf.buffers() end, { desc = "Buscar Buffers (fzf)" })
-        map("n", "<leader>fh", function() fzf.help_tags() end, { desc = "Ayuda Neovim (fzf)" })
-        map("n", "<leader>fc", function() fzf.command_history() end, { desc = "Historial Comandos (fzf)" })
-    end
+                layout = "horizontal",
+                horizontal = "right:50%",
+                scrollbar = false,
+            }
+        },
+    },
 }
-

@@ -2,8 +2,5 @@
   "trustedtaps": [
     "homebrew-zathura/zathura",
     "jesseduffield/lazygit"
-  ],
-  "trustedformulae": [
-    "thomas-mauran/tap/chess-tui"
   ]
 }

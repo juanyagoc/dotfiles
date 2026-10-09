@@ -1,45 +1,21 @@
 return {
     "lervag/vimtex",
-    ft = "tex",	-- we don't want to lazy load VimTeX, only when opening a .tex file
-    -- tag = "v2.15", -- uncomment to pin to a specific release
+    lazy = false, -- si no, falla la búsqueda inversa (VimTeX ya carga perezosamente por dentro)
     init = function()
-        -- VimTeX configuration
-        vim.g.vimtex_view_method = 'general'
-        vim.g.vimtex_view_general_viewer = 'zathura'
-        -- vim.g.vimtex_compiler_latexmk = {
-        --   continuous = 1,
-        --   options = {
-        --     "-interaction=nonstopmode",
-        --     "-synctex=1",
-        --     "-pvc",
-        --     "-pdf",
-        --     "-view=none",
-        --     "-quiet",
-        --   },
-        -- }
-
-        -- Indentation settings
-        vim.g.vimtex_indent_enabled = false         -- Disable auto-indent from Vimtex
-        vim.g.tex_indent_items = true               -- Disable indent for enumerate - currently enabled
-        vim.g.tex_indent_brace = false              -- Disable brace indent
-
-        -- Suppression settings
-        vim.g.vimtex_quickfix_mode = 0              -- Suppress quickfix on save/build
-        vim.g.vimtex_log_ignore = {                 -- Suppress specific log messages
-            'Underfull',
-            'Overfull',
-            'specifier changed to',
-            'Token not allowed in a PDF string',
+        vim.g.vimtex_view_method = "sioyek"
+        vim.g.vimtex_quickfix_mode = 2
+        vim.g.vimtex_quickfix_open_on_warning = 0
+        vim.g.vimtex_quickfix_ignore_filters = {
+            "Underfull", "Overfull", "specifier changed to",
+            "Token not allowed in a PDF string",
         }
 
-        -- Initiate compilation when a .tex is opened
+        vim.g.vimtex_indent_enabled = false
 
-        --	vim.api.nvim_create_autocmd("FileType", {
-        --           pattern = "tex",
-        --            callback = function()
-        --            vim.cmd("VimtexCompile")
-        --           end,
-        --      })
+        vim.api.nvim_create_autocmd("User", {
+            group = vim.api.nvim_create_augroup("juan_vimtex", { clear = true }),
+            pattern = "VimtexEventInitPost",
+            command = "VimtexCompile",
+        })
     end,
 }
-
