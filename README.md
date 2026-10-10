@@ -18,9 +18,8 @@ Personal config for terminal, zsh shell and brew tools. With Neovim and [Lazy.nv
 | **tmux** | Terminal multiplexer config |
 | **Neovim** | LazyVim setup (`init.lua`, `lua/`, `lazy-lock.json`) |
 | **Zsh** | Config lives under `.config/zsh` (uses `ZDOTDIR`). Oh My Zsh is installed officially by `install.sh`; only `custom/` (your plugins, aliases, theme) is versioned here |
-| **Starship** | Prompt config (used alongside p10k) |
 | **fastfetch** | System info on shell startup |
-| **zathura** | PDF viewer theme (cloned on install, not versioned here) |
+| **sioyek** | PDF viewer |
 | **Homebrew** | `Brewfile` with all CLI tools and casks |
 | **Fonts** | Hack Nerd Font (Mono, Propo, regular) |
 
@@ -68,9 +67,7 @@ dotfiles/
 │   ├── fastfetch/
 │   ├── homebrew/
 │   ├── nvim/           # LazyVim
-│   ├── oh-my-zsh/
-│   │   └── custom/     # the only part versioned; framework installed by install.sh
-│   ├── starship.toml
+│   ├── sioyek/
 │   └── tmux/
 │   └── zsh/            # .zshrc, .p10k.zsh (ZDOTDIR target)
 ├── fonts/Hack/
