@@ -10,7 +10,7 @@ return {
         { "<leader>a", function() harpoon_list():add() end, desc = "Harpoon: Marcar archivo" },
         -- Se elimina de la lista con "dd"
         {
-            "<C-e>",
+            "<leader>h",
             function()
                 require("harpoon").ui:toggle_quick_menu(harpoon_list(), {
                     border = "rounded",
@@ -21,10 +21,9 @@ return {
             end,
             desc = "Harpoon: Ver menu",
         },
-        { "<leader>h", function() harpoon_list():select(1) end, desc = "Harpoon: Archivo 1" },
-        { "<leader>j", function() harpoon_list():select(2) end, desc = "Harpoon: Archivo 2" },
-        { "<leader>k", function() harpoon_list():select(3) end, desc = "Harpoon: Archivo 3" },
-        { "<leader>l", function() harpoon_list():select(4) end, desc = "Harpoon: Archivo 4" },
+        { "<leader>j", function() harpoon_list():select(1) end, desc = "Harpoon: Archivo 1" },
+        { "<leader>k", function() harpoon_list():select(2) end, desc = "Harpoon: Archivo 2" },
+        { "<leader>l", function() harpoon_list():select(3) end, desc = "Harpoon: Archivo 3" },
     },
     config = function()
         require("harpoon"):setup()

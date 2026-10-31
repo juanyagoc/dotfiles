@@ -42,3 +42,4 @@ opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,te
 opt.mouse = "a"   -- abilites the mouse for 'a'll interactions
 opt.sidescrolloff = 8
 opt.scrolloff = 5
+

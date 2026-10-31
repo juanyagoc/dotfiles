@@ -25,6 +25,7 @@ return {
       "java",
       "haskell",
       "sql",
+      "javascript",
     })
 
     -- resaltado e indentación con treesitter cuando haya parser

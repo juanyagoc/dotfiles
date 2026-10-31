@@ -21,4 +21,6 @@ vim.api.nvim_create_user_command('Run', 'wa | !sol', {})
 
 require("juan.core.options")
 require("juan.core.keymaps")
+-- configuración de la statusline basada en SeniorMars/dotfiles
+require("config.statusline")
 
