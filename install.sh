@@ -13,10 +13,9 @@
 #   3. Installs everything listed in the Brewfile (brew bundle)
 #   4. Backs up your current configs before changing anything
 #   5. Creates symlinks from .config/* to the dotfiles repo
-#   6. Installs Hack Nerd Font
-#   7. Synchronizes LazyVim plugins in headless mode
-#   8. Clones Powerlevel10k if not already present in oh-my-zsh/custom/themes
-#   9. Changes the default shell to zsh if it isn't already
+#   6. Synchronizes LazyVim plugins in headless mode
+#   7. Clones Powerlevel10k if not already present in oh-my-zsh/custom/themes
+#   8. Changes the default shell to zsh if it isn't already
 #
 set -euo pipefail
 
@@ -27,7 +26,6 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_SRC="$DOTFILES_DIR/.config"
 CONFIG_DST="$HOME/.config"
 BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
-FONTS_DST="$HOME/Library/Fonts"
 
 # Colors for messages
 c_info()  { printf "\033[1;34m[INFO]\033[0m %s\n" "$1"; }
@@ -188,19 +186,7 @@ fi
 link_item "$CONFIG_SRC/oh-my-zsh/custom" "$OMZ_DST/custom"
 
 # ────────────────────────────────────────────────────────────
-# 6. Fonts (Hack Nerd Font)
-# ────────────────────────────────────────────────────────────
-if [[ -d "$DOTFILES_DIR/fonts/Hack" ]]; then
-  c_info "Installing Hack Nerd Font..."
-  mkdir -p "$FONTS_DST"
-  cp -n "$DOTFILES_DIR"/fonts/Hack/*.ttf "$FONTS_DST/" 2>/dev/null || true
-  c_ok "Fonts copied to $FONTS_DST"
-else
-  c_warn "Fonts folder not found. Skipping."
-fi
-
-# ────────────────────────────────────────────────────────────
-# 7. Third-party themes/frameworks not versioned (vendored)
+# 6. Third-party themes/frameworks not versioned (vendored)
 # ────────────────────────────────────────────────────────────
 
 # Powerlevel10k
@@ -233,19 +219,8 @@ else
   c_ok "zsh-syntax-highlighting already present."
 fi
 
-# Zathura (external theme)
-ZATHURA_THEME_REPO="https://github.com/pwmt/zathura.git"
-ZATHURA_DST="$CONFIG_DST/zathura"
-if [[ ! -d "$ZATHURA_DST" ]]; then
-  c_info "Cloning zathura theme..."
-  git clone --depth=1 "$ZATHURA_THEME_REPO" "$ZATHURA_DST"
-  c_ok "Zathura theme cloned."
-else
-  c_ok "zathura already present in $ZATHURA_DST."
-fi
-
 # ────────────────────────────────────────────────────────────
-# 8. LazyVim: headless sync of plugins using lazy-lock.json
+# 7. LazyVim: headless sync of plugins using lazy-lock.json
 # ────────────────────────────────────────────────────────────
 if command -v nvim &>/dev/null; then
   c_info "Synchronizing LazyVim plugins (headless)..."
@@ -256,7 +231,7 @@ else
 fi
 
 # ────────────────────────────────────────────────────────────
-# 9. Default shell -> zsh
+# 8. Default shell -> zsh
 # ────────────────────────────────────────────────────────────
 ZSH_PATH="$(command -v zsh)"
 if [[ "$SHELL" != "$ZSH_PATH" ]]; then
@@ -278,7 +253,7 @@ c_ok "Installation completed."
 if [[ -d "$BACKUP_DIR" ]]; then
   c_info "A backup of your previous configs was created at: $BACKUP_DIR"
 fi
-c_info "Open Alacritty and select the 'Hack Nerd Font' font in alacritty.toml if it is not already configured."
+c_info "Open Alacritty and select the 'JuliaMono Nerd Font Mono' font in alacritty.toml if it is not already configured."
 c_info "ZDOTDIR points to $CONFIG_DST/zsh - open a NEW terminal (running 'source' is not enough) for ~/.zshenv to take effect."
 c_info "Verify inside .config/zsh/.zshrc that ZSH=\"$CONFIG_DST/oh-my-zsh\""
 

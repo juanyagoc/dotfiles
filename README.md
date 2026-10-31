@@ -47,7 +47,7 @@ chmod +x install.sh
 5. Set `ZDOTDIR` via `~/.zshenv` so zsh reads its config from `~/.config/zsh`
 6. Install Oh My Zsh officially, then overlay the versioned `custom/` folder on top
 7. Install Hack Nerd Font into `~/Library/Fonts`
-8. Clone Powerlevel10k, zsh-autosuggestions, zsh-syntax-highlighting, and the zathura theme if missing
+8. Clone Powerlevel10k, zsh-autosuggestions and zsh-syntax-highlighting
 9. Sync Neovim/LazyVim plugins headlessly using `lazy-lock.json`
 10. Set zsh as the default shell
 
@@ -76,7 +76,7 @@ dotfiles/
 └── README.md
 ```
 
-`.config/oh-my-zsh` (except `custom/`), `.config/zathura`, and `.config/tmux/plugins` aren't versioned — they're installed/cloned by `install.sh` on setup.
+`.config/oh-my-zsh` (except `custom/`), `.config/sioyek`, and `.config/tmux/plugins` aren't versioned — they're installed/cloned by `install.sh` on setup.
 
 **Note on Oh My Zsh:** only `.config/oh-my-zsh/custom` is versioned in this repo. The framework itself, plus `zsh-autosuggestions`, `zsh-syntax-highlighting`, and Powerlevel10k, are installed fresh by `install.sh` and are gitignored — so `omz update` works normally.
 

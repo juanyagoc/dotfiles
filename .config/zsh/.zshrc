@@ -1,3 +1,9 @@
+if [[ -o interactive && -z "$TMUX" && -t 1 \
+      && ( -n "$ALACRITTY_SOCKET" || -n "$ALACRITTY_LOG" ) \
+      && -x /opt/homebrew/bin/tmux ]]; then
+  export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+  exec tmux new-session -A -s main
+fi
 # =========================================
 # Powerlevel10k instant prompt
 # =========================================
@@ -152,9 +158,4 @@ function cfnew {
 # Carga de Powerlevel10k
 # =========================================
 [[ ! -f "$ZDOTDIR/.p10k.zsh" ]] || source "$ZDOTDIR/.p10k.zsh"
-
-# Si estamos en una terminal interactiva y NO estamos ya dentro de tmux
-if [[ -z "$TMUX" ]] && [[ -n "$PS1" ]]; then
-    exec tmux new-session -A -s main
-fi
 

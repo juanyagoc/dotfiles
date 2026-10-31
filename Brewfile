@@ -1,4 +1,3 @@
-tap "homebrew-zathura/zathura", trusted: true
 tap "jesseduffield/lazygit", trusted: true
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"

@@ -21,7 +21,7 @@ args = ["-l"]
 hide_when_typing = true
 
 [font]
-normal = { family = "Hack Nerd Font Mono", style = "Regular" }
+normal = { family = "JuliaMono Nerd Font Mono", style = "Regular" }
 size = 16
 
 [cursor]
