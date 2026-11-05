@@ -5,17 +5,20 @@
 #
 # Usage:
 #   cd ~/dotfiles
+#   chmod +x install.sh (execution permission)
 #   ./install.sh
 #
 # What it does:
 #   1. Verifies that you are on macOS Apple Silicon (arm64)
 #   2. Installs Homebrew if it doesn't exist
 #   3. Installs everything listed in the Brewfile (brew bundle)
-#   4. Backs up your current configs before changing anything
-#   5. Creates symlinks from .config/* to the dotfiles repo
-#   6. Synchronizes LazyVim plugins in headless mode
-#   7. Clones Powerlevel10k if not already present in oh-my-zsh/custom/themes
-#   8. Changes the default shell to zsh if it isn't already
+#   4. Installs what Homebrew can't provide: Alacritty, Sioyek and
+#      JuliaMono Nerd Font (downloaded from their official GitHub releases)
+#   5. Backs up your current configs before changing anything
+#   6. Creates symlinks from .config/* to the dotfiles repo
+#   7. Synchronizes LazyVim plugins in headless mode
+#   8. Clones Powerlevel10k if not already present in oh-my-zsh/custom/themes
+#   9. Changes the default shell to zsh if it isn't already
 #
 set -euo pipefail
 
@@ -50,12 +53,16 @@ fi
 
 c_ok "macOS Apple Silicon detected."
 
+c_info "sudo for unattended installation..."
+sudo -v
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
 # ────────────────────────────────────────────────────────────
 # 2. Homebrew
 # ────────────────────────────────────────────────────────────
 if ! command -v brew &>/dev/null; then
-  c_info "Homebrew not found. Installing..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  c_info "Homebrew not found. Installing (non-interactive)..."
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   eval "$(/opt/homebrew/bin/brew shellenv)"
   c_ok "Homebrew installed."
 else
@@ -75,7 +82,90 @@ else
 fi
 
 # ────────────────────────────────────────────────────────────
-# 4. Safe symlink function with backup
+# 4. Apps and fonts that Homebrew can't provide
+#     - Alacritty: the Homebrew cask is disabled
+#     - Sioyek and JuliaMono Nerd Font: no cask available
+#     All are downloaded from their official GitHub releases.
+# ────────────────────────────────────────────────────────────
+APPS_DST="/Applications"
+FONTS_DST="$HOME/Library/Fonts"
+SIOYEK_VERSION="v2.0.0"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+download() {
+  curl -fL --retry 3 --progress-bar -o "$2" "$1"
+}
+
+github_latest_tag() {
+  local final
+  final="$(curl -fsSL -o /dev/null -w '%{url_effective}' "https://github.com/$1/releases/latest")"
+  printf '%s' "${final##*/}"
+}
+
+INSTALLED_APP=""
+install_app_from_dmg() {
+  local dmg="$1" mnt app
+  mnt="$(mktemp -d "$TMP_DIR/mnt.XXXXXX")"
+  hdiutil attach "$dmg" -nobrowse -readonly -quiet -mountpoint "$mnt"
+  app="$(find "$mnt" -maxdepth 2 -name '*.app' -print -quit)"
+  if [[ -z "$app" ]]; then
+    hdiutil detach "$mnt" -quiet || true
+    c_err "No .app found inside $(basename "$dmg")"
+    return 1
+  fi
+  INSTALLED_APP="$APPS_DST/$(basename "$app")"
+  rm -rf "$INSTALLED_APP"
+  ditto "$app" "$INSTALLED_APP"
+  hdiutil detach "$mnt" -quiet || true
+  xattr -cr "$INSTALLED_APP"
+}
+
+# ---- Alacritty ----
+if [[ -d "$APPS_DST/Alacritty.app" ]]; then
+  c_ok "Alacritty is already installed."
+else
+  c_info "Installing Alacritty from GitHub releases..."
+  ALACRITTY_TAG="$(github_latest_tag alacritty/alacritty)"
+  download "https://github.com/alacritty/alacritty/releases/download/$ALACRITTY_TAG/Alacritty-$ALACRITTY_TAG.dmg" "$TMP_DIR/alacritty.dmg"
+  install_app_from_dmg "$TMP_DIR/alacritty.dmg"
+  c_ok "Alacritty $ALACRITTY_TAG installed."
+fi
+
+# ---- Sioyek ----
+if [[ -d "$APPS_DST/sioyek.app" || -d "$APPS_DST/Sioyek.app" ]]; then
+  c_ok "Sioyek is already installed."
+else
+  c_info "Installing Sioyek $SIOYEK_VERSION from GitHub releases..."
+  download "https://github.com/ahrm/sioyek/releases/download/$SIOYEK_VERSION/sioyek-release-mac.zip" "$TMP_DIR/sioyek.zip"
+  unzip -q "$TMP_DIR/sioyek.zip" -d "$TMP_DIR/sioyek"
+  install_app_from_dmg "$(find "$TMP_DIR/sioyek" -name '*.dmg' -print -quit)"
+  c_ok "Sioyek installed at $INSTALLED_APP."
+
+  # Older Sioyek builds can be Intel-only: make sure Rosetta 2 is there if so
+  SIOYEK_BIN="$(find "$INSTALLED_APP/Contents/MacOS" -type f -perm -u+x -print -quit 2>/dev/null || true)"
+  if [[ -n "$SIOYEK_BIN" ]] && ! lipo -archs "$SIOYEK_BIN" 2>/dev/null | grep -qw arm64; then
+    c_warn "This Sioyek build is Intel-only; it needs Rosetta 2 to run on Apple Silicon."
+    if ! /usr/bin/pgrep -q oahd; then
+      c_info "Installing Rosetta 2..."
+      softwareupdate --install-rosetta --agree-to-license
+    fi
+  fi
+fi
+
+# ---- JuliaMono Nerd Font (Mono variant -> "JuliaMono Nerd Font Mono") ----
+if compgen -G "$FONTS_DST/JuliaMonoNerdFontMono-*.ttf" > /dev/null; then
+  c_ok "JuliaMono Nerd Font is already installed."
+else
+  c_info "Installing JuliaMono Nerd Font..."
+  mkdir -p "$FONTS_DST"
+  download "https://github.com/mietzen/juliamono-nerd-font/releases/latest/download/fonts.zip" "$TMP_DIR/fonts.zip"
+  unzip -q -o "$TMP_DIR/fonts.zip" 'JuliaMonoNerdFontMono-*.ttf' -d "$FONTS_DST"
+  c_ok "JuliaMono Nerd Font Mono installed in $FONTS_DST."
+fi
+
+# ────────────────────────────────────────────────────────────
+# 5. Safe symlink function with backup
 # ────────────────────────────────────────────────────────────
 link_item() {
   local src="$1"
@@ -106,7 +196,7 @@ link_item() {
 }
 
 # ────────────────────────────────────────────────────────────
-# 5. Configuration Symlinks
+# 6. Configuration Symlinks
 # ────────────────────────────────────────────────────────────
 c_info "Creating configuration symlinks..."
 
@@ -120,12 +210,11 @@ link_item "$CONFIG_SRC/zsh"           "$CONFIG_DST/zsh"
 link_item "$CONFIG_SRC/homebrew"      "$CONFIG_DST/homebrew"
 
 # ────────────────────────────────────────────────────────────
-# 5b. ~/.zshenv - required for zsh (and the Oh My Zsh installer)
+# 6b. ~/.zshenv - required for zsh (and the Oh My Zsh installer)
 #     to know where ZDOTDIR is BEFORE touching .zshrc
 # ────────────────────────────────────────────────────────────
 ZSHENV_PATH="$HOME/.zshenv"
 
-# Definimos el bloque de variables XDG y ZDOTDIR
 read -r -d '' XDG_BLOCK << 'EOF' || true
 
 # --- XDG Base Directory Specification ---
@@ -137,21 +226,17 @@ export ZDOTDIR="$HOME/.config/zsh"
 EOF
 
 if [[ -f "$ZSHENV_PATH" ]]; then
-  # Comprobamos si ya tiene la variable para evitar duplicados si lo ejecutas varias veces
   if grep -qF 'XDG_CONFIG_HOME' "$ZSHENV_PATH"; then
     c_ok "$HOME/.zshenv already contains XDG variables."
   else
-    # Hacemos backup usando tus variables
     mkdir -p "$BACKUP_DIR"
     cp "$ZSHENV_PATH" "$BACKUP_DIR/.zshenv_$(date +%s)"
     c_warn "Backup of existing ~/.zshenv created."
     
-    # Añadimos las variables al final del archivo
     echo "$XDG_BLOCK" >> "$ZSHENV_PATH"
     c_ok "$HOME/.zshenv updated with XDG variables and ZDOTDIR."
   fi
 else
-  # Si no existe, lo creamos directamente
   echo "$XDG_BLOCK" > "$ZSHENV_PATH"
   c_ok "$HOME/.zshenv created with XDG variables and ZDOTDIR."
 fi
@@ -186,7 +271,7 @@ fi
 link_item "$CONFIG_SRC/oh-my-zsh/custom" "$OMZ_DST/custom"
 
 # ────────────────────────────────────────────────────────────
-# 6. Third-party themes/frameworks not versioned (vendored)
+# 7. Third-party themes/frameworks not versioned (vendored)
 # ────────────────────────────────────────────────────────────
 
 # Powerlevel10k
@@ -220,7 +305,7 @@ else
 fi
 
 # ────────────────────────────────────────────────────────────
-# 7. LazyVim: headless sync of plugins using lazy-lock.json
+# 8. LazyVim: headless sync of plugins using lazy-lock.json
 # ────────────────────────────────────────────────────────────
 if command -v nvim &>/dev/null; then
   c_info "Synchronizing LazyVim plugins (headless)..."
@@ -231,7 +316,7 @@ else
 fi
 
 # ────────────────────────────────────────────────────────────
-# 8. Default shell -> zsh
+# 9. Default shell -> zsh
 # ────────────────────────────────────────────────────────────
 ZSH_PATH="$(command -v zsh)"
 if [[ "$SHELL" != "$ZSH_PATH" ]]; then

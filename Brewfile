@@ -47,8 +47,6 @@ brew "neovim"
 brew "neovim-remote"
 # Port scanning utility for large networks
 brew "nmap"
-# Open-source, cross-platform JavaScript runtime environment
-brew "node"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
 # Render and include figures in Pandoc documents using many plotting toolkits
@@ -63,8 +61,6 @@ brew "pyenv"
 brew "ripgrep"
 # Extremely fast Python linter, written in Rust
 brew "ruff"
-# Strong open-source chess engine
-brew "stockfish"
 # Opinionated Lua code formatter
 brew "stylua"
 # Terminal multiplexer
@@ -78,11 +74,7 @@ brew "wget"
 # Developer platform
 cask "dotnet-sdk"
 cask "font-hack-nerd-font"
-cask "font-iosevka-term-nerd-font"
 cask "font-juliamono"
-cask "font-meslo-lg-nerd-font"
-# JDK from the Eclipse Foundation (Adoptium)
-cask "temurin@21"
 vscode "evgeniypeshkov.syntax-highlighter"
 vscode "haskell.haskell"
 vscode "haskell.language-haskell"
@@ -126,5 +118,4 @@ vscode "vscjava.vscode-java-pack"
 vscode "vscjava.vscode-java-test"
 vscode "vscjava.vscode-maven"
 vscode "vscodevim.vim"
-npm "@anthropic-ai/claude-code"
 npm "neovim"
